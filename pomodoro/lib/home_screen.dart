@@ -11,13 +11,23 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int totalSeconds = 1500;
+  int totalPomodoros = 0;
   bool isRunning = false;
   late Timer timer;
 
   void onTick(Timer timer) {
-    setState(() {
-      totalSeconds = totalSeconds - 1;
-    });
+    if (totalSeconds == 0) {
+      setState(() {
+        totalPomodoros += 1;
+        totalSeconds = 1500;
+        isRunning = false;
+      });
+      timer.cancel();
+    } else {
+      setState(() {
+        totalSeconds = totalSeconds - 1;
+      });
+    }
   }
 
   void onStartPressed() {
@@ -34,6 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String timeFormat(int seconds) {
+    var duration =
+        Duration(seconds: seconds).toString().split('.').first.substring(2);
+    return duration;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
               flex: 2,
               child: Center(
                 child: Text(
-                  '$totalSeconds',
+                  timeFormat(totalSeconds),
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.w600,
@@ -74,7 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(60),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50),
+                          ),
                           color: Theme.of(context).cardColor,
                         ),
                         child: Column(
@@ -90,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       .color),
                             ),
                             Text(
-                              '0',
+                              '$totalPomodoros',
                               style: TextStyle(
                                   fontSize: 40,
                                   color: Theme.of(context)
